@@ -1,2 +1,3 @@
+
 #[derive(Debug)]
-pub struct Asparagus {}
+pub struct Asparagus {} // public struct

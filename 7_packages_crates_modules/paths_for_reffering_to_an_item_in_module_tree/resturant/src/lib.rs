@@ -39,19 +39,23 @@ pub fn eat_at_restaurant() {
 fn deliver_order() {}
 
 mod back_of_house {
-
+    // This function fix incorrect order
     fn fix_incorrect_order() {
         cook_order();
+        // `super` access to outside function
         super::deliver_order();
     }
 
     fn cook_order() {}
+    //define struct of Breakfast
     pub struct Breakfast {
         pub toast: String,
         seasonal_fruit: String,
     }
 
+    // implementation of Breakfast
     impl Breakfast {
+        // create summer Breakfast
         pub fn summer(toast: &str) -> Breakfast {
             Breakfast {
                 toast: String::from(toast),
@@ -60,6 +64,7 @@ mod back_of_house {
         }
     }
 
+    // enum of meals
     pub enum Appetizer {
         Soup,
         Salad,
