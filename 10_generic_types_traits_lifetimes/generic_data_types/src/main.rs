@@ -14,7 +14,7 @@ fn main() {
     let result = largest::largest(&char_list);
     println!("The largest char is {}", result);
 
-    // miximg points
+    // mixing points
     let p1 = point::Point { x: 5, y: 10.4 };
     let p2 = point::Point { x: "Hello", y: 'c' };
 
