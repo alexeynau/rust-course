@@ -1,7 +1,7 @@
 use std::env;
 use std::error::Error;
 use std::fs;
-
+// config structure
 pub struct Config {
     pub query: String,
     pub file_path: String,
@@ -9,16 +9,18 @@ pub struct Config {
 }
 
 impl Config {
+    // creates a config instance
     pub fn build(args: &[String]) -> Result<Config, &'static str> {
+        // there should be at least 3 param
         if args.len() < 3 {
             return Err("not enough arguments");
         }
-
+        // initing fields
         let query = args[1].clone();
         let file_path = args[2].clone();
-
+        // if is OK we ignore case while searching
         let ignore_case = env::var("IGNORE_CASE").is_ok();
-
+        // return a Config
         Ok(Config {
             query,
             file_path,
@@ -26,26 +28,29 @@ impl Config {
         })
     }
 }
-
+// run a program according due to config
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    // read file, throws error on any problem
     let contents = fs::read_to_string(config.file_path)?;
 
+    // get results according to ignore_case value
     let results = if config.ignore_case {
         search_case_insensitive(&config.query, &contents)
     } else {
         search(&config.query, &contents)
     };
-
+    // print every line of result
     for line in results {
         println!("{line}");
     }
 
     Ok(())
 }
-
+// search query in lines of text and returns theese lines 
+// case sensetive
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     let mut results = Vec::new();
-
+    // push line to results vector if it contains a query
     for line in contents.lines() {
         if line.contains(query) {
             results.push(line);
@@ -55,14 +60,18 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     results
 }
 
+// search query in lines of text and returns theese lines 
+// case insensetive
 pub fn search_case_insensitive<'a>(
     query: &str,
     contents: &'a str,
 ) -> Vec<&'a str> {
+    // query to lowercase
     let query = query.to_lowercase();
     let mut results = Vec::new();
-
+    // push line to results vector if it contains a query
     for line in contents.lines() {
+        // line to lowercase
         if line.to_lowercase().contains(&query) {
             results.push(line);
         }
@@ -74,7 +83,7 @@ pub fn search_case_insensitive<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    // test if search function is sensetive to case
     #[test]
     fn case_sensitive() {
         let query = "duct";
@@ -87,6 +96,7 @@ Duct tape.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 
+    // test if search_insensative function is insensetive to case
     #[test]
     fn case_insensitive() {
         let query = "rUsT";
