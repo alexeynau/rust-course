@@ -1,41 +1,33 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::rc::Rc;
-
 fn main() {
-    let m = Mutex::new(5);//create mutex   
+    //create mutex  
+    let m = Mutex::new(5); 
 
+    //pick the value from mutex
     {
-        let mut num = m.lock().unwrap();//pick the value from mutex
+        let mut num = m.lock().unwrap();
         *num = 6;//change value in mutex
     }
-
-    println!("m = {:?}", m);//print value in mutex
-
-}
-
-fn counter_ex(){
-    let counter = Arc::new(Mutex::new(0));//create mutex
-    let mut handles = vec![];//create vector of threads
-
-    // for _ in 0..10 {
-    //     let handle = thread::spawn(move || {//we cant use the data from mutex in few threads
-    //         let mut num = counter.lock().unwrap();
-
-    //         *num += 1;
-    //     });
-    //     handles.push(handle);
-    // }
-
+    //print value in mutex
+    println!("m = {:?}", m);
+    //create mutex
+    let counter = Arc::new(Mutex::new(0));
+    //create vector of threads
+    let mut handles = vec![];
 
     for _ in 0..10 {
-        let counter = Arc::clone(&counter);//clone our counter
-        let handle = thread::spawn(move || {//in every iteration we spawn new thread
-            let mut num = counter.lock().unwrap();//pick the calue from mutex
-
-            *num += 1;//change it and then lock it
+        //clone our counter
+        let counter = Arc::clone(&counter);
+        //in every iteration we spawn new thread
+        let handle = thread::spawn(move || {
+            //pick the calue from mutex
+            let mut num = counter.lock().unwrap();
+            //change it and then lock it
+            *num += 1;
         });
-        handles.push(handle);//push the thread in vector
+        //push the thread in vector
+        handles.push(handle);
     }
 
 
@@ -46,4 +38,5 @@ fn counter_ex(){
     }
 
     println!("Result: {}", *counter.lock().unwrap());
+
 }
