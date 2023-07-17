@@ -69,6 +69,7 @@ mod tests {
         }
     }
 
+    // check if it sends an over 75 percent warning message
     #[test]
     fn it_sends_an_over_75_percent_warning_message() {
         let mock_messenger = MockMessenger::new();
