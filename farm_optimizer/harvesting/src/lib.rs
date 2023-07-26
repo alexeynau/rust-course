@@ -1,6 +1,7 @@
 use std::{
     sync::{mpsc, Arc, Mutex},
     thread,
+    time::Duration,
 };
 // manage threads
 pub struct ThreadPool {
@@ -18,17 +19,17 @@ impl ThreadPool {
     /// # Panics
     ///
     /// The `new` function will panic if the size is zero.
-    pub fn new(size: usize) -> ThreadPool {
+    pub fn new(size: u64) -> ThreadPool {
         assert!(size > 0);
-        //define tx and rx 
+        //define tx and rx
         let (sender, receiver) = mpsc::channel();
         //create value to reciver
         let receiver = Arc::new(Mutex::new(receiver));
 
-        let mut workers = Vec::with_capacity(size);
+        let mut workers = Vec::with_capacity(size.try_into().unwrap());
 
         for id in 0..size {
-            workers.push(Worker::new(id, Arc::clone(&receiver)));
+            workers.push(Worker::new(id.try_into().unwrap(), Arc::clone(&receiver)));
         }
         //return new instanse of struct
         ThreadPool {
@@ -96,4 +97,32 @@ impl Worker {
             thread: Some(thread),
         }
     }
+}
+
+// this function simulate work of workers
+pub fn model(time_matrix: &Vec<Vec<u64>>, number_of_workers: u64) -> u64 {
+    let mut sum_of_job = 0;
+    let pool = ThreadPool::new(number_of_workers);
+
+    for row in time_matrix {
+        for element in row {
+            let time = element.clone();
+            sum_of_job += time;
+            pool.execute(move || {
+                do_hay_harvesting(time);
+            });
+        }
+    }
+    println!("sum: {sum_of_job}");
+    if (sum_of_job % number_of_workers == 0) {
+        sum_of_job / number_of_workers
+    } else {
+        sum_of_job / number_of_workers + 1
+    }
+}
+
+// this function simulate a job
+fn do_hay_harvesting(time: u64) {
+    println!("sleep for {time} seconds");
+    thread::sleep(Duration::from_secs(time));
 }
